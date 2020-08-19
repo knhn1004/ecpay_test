@@ -11,6 +11,8 @@ DB	config/db.js	/^const connectDB = async () => {$/;"	c
 DB	server.js	/^const connectDB = require('.\/config\/db')$/;"	c
 HashKey	utils/generateCheckMacValue.js	/^  checkValue = `HashKey=${hashKey}&${checkValue}HashIV=${hashIV}` \/\/ There is already an & in the end of checkValue$/;"	c
 MerchantTradeDate	server.js	/^    MerchantTradeDate: format(new Date(), 'yyyy\/MM\/dd HH:mm:ss'),$/;"	c
+MerchantTradeNo	server.js	/^  const MerchantTradeNo = cryptoRandomString({ length: 20 })$/;"	c
+RandomString	server.js	/^const cryptoRandomString = require('crypto-random-string')$/;"	c
 Value	utils/generateCheckMacValue.js	/^  checkValue = encodeURIComponent(checkValue).toLowerCase()$/;"	c
 exports	utils/generateCheckMacValue.js	/^module.exports = { generateCheckMacValue }$/;"	o
 for	utils/generateCheckMacValue.js	/^  for (const key of keys) {$/;"	f

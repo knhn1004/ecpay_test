@@ -18,6 +18,7 @@ const generateCheckMacValue = (data, hashKey, hashIV) => {
     .replace(/%28/g, '(')
     .replace(/%29/g, ')')
     .replace(/%20/g, '+')
+
   checkValue = crypto.createHash('sha256').update(checkValue).digest('hex')
   checkValue = checkValue.toUpperCase()
   return checkValue

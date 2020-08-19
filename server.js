@@ -4,7 +4,9 @@ const morgan = require('morgan')
 const connectDB = require('./config/db')
 const qs = require('querystring')
 const axios = require('axios')
+const cryptoRandomString = require('crypto-random-string')
 const { format } = require('date-fns')
+const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const { generateCheckMacValue } = require('./utils/generateCheckMacValue')
 dotenv.config({ path: './config/config.env' })
@@ -14,6 +16,8 @@ connectDB()
 const app = express()
 app.use(express.json({ extended: false }))
 
+// app.use(express.static('public'))
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
@@ -22,28 +26,35 @@ app.get('/', (_, res) => {
   res.send('hello world')
 })
 
+const url = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5'
+const link = 'https://payment-stage.ecpay.com.tw'
+
+app.use('/Content', createProxyMiddleware({ target: link, changeOrigin: true}))
+app.use('/Scripts', createProxyMiddleware({ target: link, changeOrigin: true }))
+app.use('/bundles', createProxyMiddleware({ target: link, changeOrigin: true }))
+
 app.get('/gen_payment', async (req, res) => {
   const hashkey = '5294y06JbISpM5x9'
   const hashIV = 'v77hoKGq4kWxNNIS'
+  const MerchantTradeNo = cryptoRandomString({ length: 20 })
   const body = {
     MerchantID: '2000132',
-    MerchantTradeNo: 'ecPay1234',
+    // 訂單編號
+    MerchantTradeNo,
     MerchantTradeDate: format(new Date(), 'yyyy/MM/dd HH:mm:ss'),
     PaymentType: 'aio',
-    TotalAmount: 5000,
-    TradeDesc: 'ecpay 商城 test',
-    ItemName: 'iphone 11 手機殼',
+    TotalAmount: 500,
+    TradeDesc: 'ecpay test',
+    ItemName: 'iphone 11',
     ReturnURL: `${process.env.PROJECT_URL}/return`,
     ChoosePayment: 'Credit',
     // CheckMacValue: '',
-    // EncryptType: 1,
+    EncryptType: 1,
   }
   body.CheckMacValue = generateCheckMacValue(body, hashkey, hashIV)
-  body.EncryptType = 1
   console.log(body)
 
   console.log(qs.stringify(body))
-  const url = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5'
   const response = await axios.post(url, qs.stringify(body), {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
